@@ -1,0 +1,235 @@
+import React, { useState } from 'react';
+
+export default function KaamSetuApp() {
+  const [currentView, setCurrentView] = useState('welcome'); // welcome, login, signup, mode-select, home, find-work, post-job, find-workers, profile
+  const [userRole, setUserRole] = useState('both'); // worker, employer, both
+  const [user, setUser] = useState({ firstName: 'दिजेन', email: 'dijen@gmail.com', phone: '9800000000', location: 'इटहरी', role: 'both' });
+
+  // नमुना डेटा (Mock Database state for Part 1)
+  const [jobs, setJobs] = useState([
+    { id: 1, title: 'घर सरसफाइ (House Cleaning)', category: 'Home Services', location: 'इटहरी', date: 'भोली', time: 'बिहान १०:०० बजे', payment: 'रु. १,५००', paymentType: 'Fixed', rating: '४.८', status: 'PUBLISHED' },
+    { id: 2, title: 'इलेक्ट्रिक मर्मत (Electrician Repair)', category: 'Skilled Work', location: 'धरान रोड, इटहरी', date: 'आज', time: 'दिउँसो २:०० बजे', payment: 'रु. २,०००', paymentType: 'Per day', rating: '४.९', status: 'PUBLISHED' }
+  ]);
+
+  const [workers, setWorkers] = useState([
+    { id: 1, name: 'राम दहाल', skill: 'Electrician', location: 'इटहरी', rating: '४.९', completedJobs: 25, availability: 'Full Day' },
+    { id: 2, name: 'सीता कार्की', skill: 'Cleaning & Cooking', location: 'इटहरी', rating: '४.७', completedJobs: 18, availability: 'Part-Time' }
+  ]);
+
+  // नयाँ काम पोस्ट गर्ने स्टेट
+  const [newJob, setNewJob] = useState({ title: '', description: '', category: 'Home Services', location: 'इटहरी', payment: '', paymentType: 'Fixed' });
+
+  // स्क्रीन अनुसार रेन्डर गर्ने फंक्सन
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center font-sans">
+      <div className="w-full max-w-md bg-white min-h-screen shadow-lg flex flex-col justify-between">
+        
+        {/* Top Header */}
+        <div className="bg-emerald-600 text-white p-4 flex justify-between items-center">
+          <div>
+            <h1 className="text-xl font-bold">कामसेतु (KaamSetu)</h1>
+            <p className="text-xs text-emerald-100">काम खोज्नुहोस्। कामदार खोज्नुहोस्।</p>
+          </div>
+          {currentView !== 'welcome' && currentView !== 'login' && currentView !== 'signup' && (
+            <button onClick={() => setCurrentView('home')} className="text-sm bg-emerald-700 px-3 py-1 rounded">होम</button>
+          )}
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1 p-4 overflow-y-auto">
+          
+          {/* १. Welcome Screen */}
+          {currentView === 'welcome' && (
+            <div className="flex flex-col items-center justify-center h-full text-center py-12">
+              <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center text-3xl mb-4">🌉</div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">स्वागत छ KaamSetu मा</h2>
+              <p className="text-gray-600 mb-8 text-sm">स्थानिय स्तरमा काम र कामदार जोड्ने भरपर्दो माध्यम।</p>
+              <button onClick={() => setCurrentView('signup')} className="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold mb-3 shadow">नयाँ खाता खोल्नुहोस् (Sign Up)</button>
+              <button onClick={() => setCurrentView('login')} className="w-full border border-emerald-600 text-emerald-600 py-3 rounded-xl font-bold">लगइन गर्नुहोस् (Login)</button>
+            </div>
+          )}
+
+          {/* २. Sign Up Screen */}
+          {currentView === 'signup' && (
+            <div>
+              <h3 className="text-lg font-bold mb-4 text-gray-800">खाता सिर्जना गर्नुहोस्</h3>
+              <input type="text" placeholder="पूरा नाम (First Name)" className="w-full p-3 border rounded-xl mb-3" />
+              <input type="email" placeholder="इमेल (Email)" className="w-full p-3 border rounded-xl mb-3" />
+              <input type="text" placeholder="फोन नम्बर (Phone Number)" className="w-full p-3 border rounded-xl mb-3" />
+              <input type="password" placeholder="पासवर्ड (Password)" className="w-full p-3 border rounded-xl mb-3" />
+              <input type="text" placeholder="ठेगाना (Location - e.g. Itahari)" className="w-full p-3 border rounded-xl mb-4" />
+              <button onClick={() => setCurrentView('mode-select')} className="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold">अगाडि बढ्नुहोस्</button>
+            </div>
+          )}
+
+          {/* ३. Login Screen */}
+          {currentView === 'login' && (
+            <div>
+              <h3 className="text-lg font-bold mb-4 text-gray-800">लगइन गर्नुहोस्</h3>
+              <input type="text" placeholder="इमेल वा फोन नम्बर" className="w-full p-3 border rounded-xl mb-3" />
+              <input type="password" placeholder="पासवर्ड" className="w-full p-3 border rounded-xl mb-4" />
+              <button onClick={() => setCurrentView('home')} className="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold">लगइन</button>
+            </div>
+          )}
+
+          {/* ४. Mode Selection after Signup */}
+          {currentView === 'mode-select' && (
+            <div className="py-6 text-center">
+              <h3 className="text-xl font-bold mb-2">तपाईं के गर्न चाहनुहुन्छ?</h3>
+              <p className="text-gray-500 text-sm mb-6">तपाईं पछि पनि यो भूमिका बदल्न सक्नुहुन्छ।</p>
+              <button onClick={() => { setUserRole('worker'); setCurrentView('home'); }} className="w-full p-4 border-2 border-emerald-600 rounded-xl mb-3 text-left font-bold text-emerald-700 bg-emerald-50">
+                👷 काम गर्ने (I want to find work)
+              </button>
+              <button onClick={() => { setUserRole('employer'); setCurrentView('home'); }} className="w-full p-4 border-2 border-blue-600 rounded-xl mb-3 text-left font-bold text-blue-700 bg-blue-50">
+                💼 काम दिने (I need a worker)
+              </button>
+              <button onClick={() => { setUserRole('both'); setCurrentView('home'); }} className="w-full p-4 border-2 border-purple-600 rounded-xl text-left font-bold text-purple-700 bg-purple-50">
+                🔄 दुवै (I want to work and hire)
+              </button>
+            </div>
+          )}
+
+          {/* ५. Home Screen */}
+          {currentView === 'home' && (
+            <div>
+              <div className="bg-emerald-50 p-4 rounded-xl mb-4">
+                <h2 className="text-lg font-bold text-emerald-900">नमस्ते, {user.firstName}! 👋</h2>
+                <p className="text-xs text-emerald-700 mt-1">स्थान: {user.location} | भूमिका: <span className="uppercase font-semibold">{userRole}</span></p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <button onClick={() => setCurrentView('find-work')} className="p-4 bg-white border border-emerald-200 rounded-xl shadow-sm text-center hover:bg-emerald-50">
+                  <span className="text-2xl block mb-1">👷</span>
+                  <span className="font-bold text-sm text-gray-800">काम खोज्नुहोस्</span>
+                </button>
+                <button onClick={() => setCurrentView('find-workers')} className="p-4 bg-white border border-blue-200 rounded-xl shadow-sm text-center hover:bg-blue-50">
+                  <span className="text-2xl block mb-1">💼</span>
+                  <span className="font-bold text-sm text-gray-800">कामदार खोज्नुहोस्</span>
+                </button>
+              </div>
+
+              <button onClick={() => setCurrentView('post-job')} className="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold mb-4 shadow">
+                ➕ नयाँ काम पोस्ट गर्नुहोस् (Post a Job)
+              </button>
+
+              <div className="bg-gray-100 p-4 rounded-xl">
+                <h4 className="font-bold text-sm text-gray-700 mb-2">तपाईंको गतिविधी</h4>
+                <p className="text-xs text-gray-500">अहिले कुनै सक्रिय काम छैन। माथिबाट काम खोज्नुहोस् वा पोस्ट गर्नुहोस्।</p>
+              </div>
+            </div>
+          )}
+
+          {/* ६. Find Work (Worker Mode) */}
+ ઉપयोगात्मक (Find Work) {currentView === 'find-work' && (
+            <div>
+              <h3 className="font-bold text-lg mb-3">उपलब्ध कामहरू (Find Work)</h3>
+              {jobs.map(job => (
+                <div key={job.id} className="border p-4 rounded-xl mb-3 shadow-sm bg-white">
+                  <div className="flex justify-between items-start mb-1">
+                    <h4 className="font-bold text-gray-800">{job.title}</h4>
+                    <span className="text-xs bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">{job.category}</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mb-2">📍 {job.location} | 📅 {job.date} ({job.time})</p>
+                  <div className="flex justify-between items-center mt-3">
+                    <span className="font-bold text-emerald-600">{job.payment}</span>
+                    <button onClick={() => alert('तपाईंले यो कामको लागि Request पठाउनुभयो!')} className="bg-emerald-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold">I Can Do This</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ७. Post a Job (Employer Mode) */}
+          {currentView === 'post-job' && (
+            <div>
+              <h3 className="font-bold text-lg mb-3">काम पोस्ट गर्नुहोस्</h3>
+              <input type="text" placeholder="कामको शीर्षक (Job Title)" value={newJob.title} onChange={e => setNewJob({...newJob, title: e.target.value})} className="w-full p-3 border rounded-xl mb-3" />
+              <textarea placeholder="विवरण (Description)" value={newJob.description} onChange={e => setNewJob({...newJob, description: e.target.value})} className="w-full p-3 border rounded-xl mb-3" rows="3"></textarea>
+              <input type="text" placeholder="स्थान (Location)" value={newJob.location} onChange={e => setNewJob({...newJob, location: e.target.value})} className="w-full p-3 border rounded-xl mb-3" />
+              <input type="text" placeholder="पारिश्रमिक (Payment e.g. रु. 1,500)" value={newJob.payment} onChange={e => setNewJob({...newJob, payment: e.target.value})} className="w-full p-3 border rounded-xl mb-4" />
+              
+              <div className="flex gap-2">
+                <button onClick={() => { alert('Draft मा सेभ भयो!'); setCurrentView('home'); }} className="w-1/2 border border-gray-400 py-3 rounded-xl font-bold text-gray-700">Save Draft</button>
+                <button onClick={() => { setJobs([...jobs, {id: Date.now(), ...newJob, date: 'आज', time: 'छिटै', status: 'PUBLISHED'}]); alert('काम सफलतापूर्वक प्रकाशित भयो!'); setCurrentView('find-work'); }} className="w-1/2 bg-emerald-600 text-white py-3 rounded-xl font-bold">Publish Job</button>
+              </div>
+            </div>
+          )}
+
+          {/* ८. Find Workers (Employer Mode) */}
+          {currentView === 'find-workers' && (
+            <div>
+              <h3 className="font-bold text-lg mb-3">कामदारहरू खोज्नुहोस् (Find Workers)</h3>
+              {workers.map(worker => (
+                <div key={worker.id} className="border p-4 rounded-xl mb-3 shadow-sm bg-white flex justify-between items-center">
+                  <div>
+                    <h4 className="font-bold text-gray-800">{worker.name}</h4>
+                    <p className="text-xs text-emerald-700 font-semibold">{worker.skill}</p>
+                    <p className="text-xs text-gray-500">📍 {worker.location} | ⭐ {worker.rating} ({worker.completedJobs} jobs)</p>
+                  </div>
+                  <button onClick={() => alert(`${worker.name लाई Request पठाइयो!`)} className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-semibold">Hire</button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ९. Profile Screen */}
+          {currentView === 'profile' && (
+            <div>
+              <h3 className="font-bold text-lg mb-4">युजर प्रोफाइल</h3>
+              <div className="bg-white p-4 border rounded-xl mb-4">
+                <p><strong>नाम:</strong> {user.firstName}</p>
+                <p><strong>इमेल:</strong> {user.email}</p>
+                <p><strong>फोन:</strong> {user.phone}</p>
+                <p><strong>स्थान:</strong> {user.location}</p>
+                <p className="mt-2"><strong>सक्रिय भूमिका:</strong> <span className="uppercase text-emerald-600 font-bold">{userRole}</span></p>
+              </div>
+              <button onClick={() => setCurrentView('mode-select')} className="w-full border border-emerald-600 text-emerald-600 py-2.5 rounded-xl font-bold mb-2">भूमिका (Role) बदल्नुहोस्</button>
+              <button onClick={() => setCurrentView('welcome')} className="w-full bg-red-50 text-red-600 py-2.5 rounded-xl font-bold">लग आउट (Logout)</button>
+            </div>
+          )}
+
+        </div>
+
+        {/* Bottom Navigation */}
+        {currentView !== 'welcome' && currentView !== 'login' && currentView !== 'signup' && currentView !== 'mode-select' && (
+          <div className="border-t bg-white flex justify-around py-3 text-xs text-gray-600">
+            <button onClick={() => setCurrentView('home')} className={`flex flex-col items-center ${currentView === 'home' ? 'text-emerald-600 font-bold' : ''}`}><span>🏠</span>होम</button>
+            <button onClick={() => setCurrentView('find-work')} className={`flex flex-col items-center ${currentView === 'find-work' ? 'text-emerald-600 font-bold' : ''}`}><span>🔎</span>एक्सप्लोर</button>
+            <button onClick={() => setCurrentView('post-job')} className={`flex flex-col items-center ${currentView === 'post-job' ? 'text-emerald-600 font-bold' : ''}`}><span>➕</span>पोस्ट</button>
+            <button onClick={() => alert('च्याट फिचर')} className="flex flex-col items-center"><span>💬</span>च्याट</button>
+            <button onClick={() => setCurrentView('profile')} className={`flex flex-col items-center ${currentView === 'profile' ? 'text-emerald-600 font-bold' : ''}`}><span>👤</span>प्रोफाइल</button>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    phone VARCHAR(20) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE profiles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE UNIQUE NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    location VARCHAR(100) NOT NULL,
+    active_role VARCHAR(20) DEFAULT 'both',
+    rating DECIMAL(3,2) DEFAULT 0.00,
+    completed_jobs INT DEFAULT 0
+);
+
+CREATE TABLE jobs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    employer_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    title VARCHAR(150) NOT NULL,
+    description TEXT NOT NULL,
+    location VARCHAR(100) NOT NULL,
+    payment_amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(30) DEFAULT 'PUBLISHED',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);s
